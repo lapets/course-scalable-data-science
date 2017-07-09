@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p aws_log
-for i in {1..2}
+for i in {1..5}
 do
    echo "Welcome $i times"
    
