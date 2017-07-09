@@ -18,7 +18,7 @@ A *set* or *dimension* is some mathematical object. Examples of sets include the
 
 A *tuple* is an ordered list of elements drawn from sets. Each entry in the list is called a *component*. For example, `(123, "abc")` is a tuple with the first component drawn from the set of natural numbers and the second component drawm from the set of string. It is possible to have sets of tuples.
 
-A *data record* or *dictionary* is a mapping from a set of *attributes* (typically strings) to *values* drawn from some set. One example is `{'name': 'Alice', 'age': 25}`. In the contemporary web ecosystem, a common format for representing records is [JSON](https://en.wikipedia.org/wiki/JSON#Example) (e.g., MongoDB uses such a format natively). In Python, these can be represented faithfully using the native [dictionary](https://docs.python.org/3/tutorial/datastructures.html#dictionaries) data structure.
+A *data record* or *dictionary* is a mapping from a set of *attributes* (typically strings) to *values* drawn from some set. One example is `{"name": "Alice", "age": 25}`. In the contemporary web ecosystem, a common format for representing records is [JSON](https://en.wikipedia.org/wiki/JSON#Example) (e.g., MongoDB uses such a format natively). In Python, these can be represented faithfully using the native [dictionary](https://docs.python.org/3/tutorial/datastructures.html#dictionaries) data structure.
 
 A *data set* is an unordered collection of records. A data set could be viewed/treated as a table within a data base (e.g., see [attribute-value system](https://en.wikipedia.org/wiki/Attribute-value_system)).
 
@@ -44,13 +44,13 @@ A well-known example of a paradigm that takes advantage of these properties is M
 
 #### Reduce Operations
 
-For example, if we have a collection of numbers we can compute the sum or the maximum across all the numbers by repeatedly grabbing numbers from the collection and combining them using a binary operator:
+For example, if we have a collection of numbers we can compute the sum or the maximum across all the numbers by repeatedly grabbing numbers from the collection and combining them using a binary operation:
 * **&Sigma;** {1, 2, 3, 4, 5} = (1 + 2) + (3 + (4 + 5))
 * **maximum** {1, 2, 3, 4, 5} = **max**(**max**(2, 5), **max**(**max**(1, 4), 5))
 
-Effectively, we have *decomposed* the overall operation into a series of applications of a binary operator. Notice that because the binary operators are associative and commutative, the order in which we do this does not matter.
+Effectively, we have *decomposed* the overall operation into a series of applications of a binary operation. Notice that because the binary operations are associative and commutative, the order in which we do this does not matter.
 
-In general, we can call this process *reduction*, and define a generic *reduce* operator that takes any binary operator and applies that operator to a list (in any order it chooses). Exactly such an operator exists in Python:
+In general, we can call this process *reduction*, and define a generic *reduce* function that takes any binary operation and applies it to a list (in any order it chooses). Exactly such a function (also called `reduce`) exists in Python:
 ```python
 >>> from functools import reduce
 >>> reduce(max, [1,2,3,4,5])
@@ -70,23 +70,23 @@ def reduce(op, xs):
     return r
 ```
 
-#### Reduce Operations over Data Sets
+#### Applying Reduce to Data Sets
 
-If we want to apply a reduce operation to an actual data set of records, we might need to define a binary operator that works on records. For instance, suppose we have a data set representing individuals:
+If we want to apply the reduce function to an actual data set of records, we might need to define a binary operation that works on records. For instance, suppose we have a data set representing individuals:
 ```python
-D = [{'name':'Alice', 'age':24}, 
-     {'name':'Bob', 'age':20}, 
-     {'name':'Carol', 'age':31}]
+D = [{"name":"Alice", "age":24}, 
+     {"name":"Bob", "age":20}, 
+     {"name":"Carol", "age":31}]
 ```
-We need to define a custom addition operator that can operate on records.
+We need to define a custom addition operation that can operate on records.
 ```python
 def max_age(r1, r2):
-    return {'age':max(r1['age'], r2['age'])}
+    return {"age":max(r1["age"], r2["age"])}
 ```
 We can then use the `reduce` function as before:
 ```python
 >>> reduce(max_age, D)
-{'age': 31}
+{"age": 31}
 ```
 
 #### Map Operations
@@ -97,24 +97,26 @@ The approach above works well in many situations but can present difficulties. S
 However, we can address this by using a *weighted* average. We would first prepare the data by augmenting it with its weight. We would then extend the binary operator to incorporate the weight.
 ```python
 def age_wgtd(r):
-    return {'age':r['age'], 'wgt':1}
+    return {"age":r["age"], "wgt":1}
 
 def avg_age_wgtd(r1, r2):
-    return {'age':r1['age'] + r2['age'], 'wgt':r1['wgt'] + r2['wgt']}
+    return {"age":r1["age"] + r2["age"], "wgt":r1["wgt"] + r2["wgt"]}
 ```
-Notice that we also took the opportunity above to drop the `'name'` attribute, which we do not need in the rest of the computation (nor does it make sense to have an individual name for an aggregate total within the context of the example). We then *map* the `age_wgtd` function across the data set records before applying our reduce operation.
+Notice that we also took the opportunity above to drop the `"name"` attribute, which we do not need in the rest of the computation (nor does it make sense to have an individual name for an aggregate total within the context of the example). We then *map* the `age_wgtd` function across the data set records before applying our reduce operation.
 ```python
 >>> map(age_wgtd, D)
-[{'age':24, 'wgt':1}, {'age':20, 'wgt':1}, {'age':31, 'wgt':1}]
+[{"age":24, "wgt":1}, {"age":20, "wgt":1}, {"age":31, "wgt":1}]
 >>> reduce(avg_age_wgtd, D)
-[{'age':75, 'wgt':3}]
+[{"age":75, "wgt":3}]
 ```
 The above gives us exactly one record from which we can compute the correct average of 75/3 = 25.
 
-In Python, there is a more concise and mathematically familiar way to write map operations natively using [comprehensions](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions):
+In most frameworks, the operation that is applied using the map function is more general: it could return no results or many results (thus providing a way to *generate* data that can later be reduced) and might involve a lengthy computation of its own.
+
+In Python, there is a more concise and mathematically familiar way to define this behavior natively using [comprehensions](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions):
 ```python
 >>> [age_wgtd(r) for r in D]
-[{'age':24, 'wgt':1}, {'age':20, 'wgt':1}, {'age':31, 'wgt':1}]
+[{"age":24, "wgt":1}, {"age":20, "wgt":1}, {"age":31, "wgt":1}]
 ```
 Note also that, as with `reduce`, we can implement our own generic `map` function, as well.
 ```python
@@ -128,6 +130,29 @@ def map(f, xs):
 ### Example: Estimating &pi;
 
 Suppose we want to estimate &pi;. We know that &pi; is the area of the unit circle (&pi; &middot; 1<sup>2</sup> = &pi;), so one way to approach this is to generate many random points (*x*, *y*) between (-1, -1) and (1, 1) (i.e., a square of area 2 &middot; 2 = 4 centered on the origin) and to count how many are at most a distance of 1 from the origin (i.e., *x*<sup>2</sup> + *y*<sup>2</sup> &le; 1). In general, we should expect about *area(circle)*/*area(square)* = &pi;/4 of the points to be in the circle, so we would only need to multiply the ratio we obtain by 4 to estimate &pi;.
+
+We can first define the operations that the map and reduce steps will perform.
+```
+from random import random
+
+def trial(instance):
+    (x, y) = (2*random()-1, 2*random()-1)
+    return {
+        "in":1 if (x**2 + y**2) <= 1 else 0, 
+        "count":1
+      }
+
+def combine(t1, t2):
+    return {"in":t1["in"]+t2["in"], "count":t1["count"]+t2["count"]}
+```
+Then, our overall result can be obtained using `map` and `reduce`:
+```
+>>> result = reduce(combine, map(trial, range(1000000)))
+>>> result
+{'count': 1000000, 'in': 785272}
+>>> 4 * result["in"] / float(result["count"])
+3.141088
+```
 
 ### Example: Computing Word Frequencies
 
