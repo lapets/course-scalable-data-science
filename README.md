@@ -120,10 +120,10 @@ In Python, there is a more concise and mathematically familiar way to define thi
 ```
 Note also that, as with `reduce`, we can implement our own generic `map` function, as well.
 ```python
-def map(f, xs):
+def map(op, xs):
     ys = [] # Our running aggregate result.
     for x in xs:
-        ys += [f(x)]
+        ys += [op(x)]
     return ys
 ```
 
@@ -132,7 +132,7 @@ def map(f, xs):
 Suppose we want to estimate &pi;. We know that &pi; is the area of the unit circle (&pi; &middot; 1<sup>2</sup> = &pi;), so one way to approach this is to generate many random points (*x*, *y*) between (-1, -1) and (1, 1) (i.e., a square of area 2 &middot; 2 = 4 centered on the origin) and to count how many are at most a distance of 1 from the origin (i.e., *x*<sup>2</sup> + *y*<sup>2</sup> &le; 1). In general, we should expect about *area(circle)*/*area(square)* = &pi;/4 of the points to be in the circle, so we would only need to multiply the ratio we obtain by 4 to estimate &pi;.
 
 We can first define the operations that the map and reduce steps will perform.
-```
+```python
 from random import random
 
 def trial(instance):
@@ -146,7 +146,7 @@ def combine(t1, t2):
     return {"in":t1["in"]+t2["in"], "count":t1["count"]+t2["count"]}
 ```
 Then, our overall result can be obtained using `map` and `reduce`:
-```
+```python
 >>> result = reduce(combine, map(trial, range(1000000)))
 >>> result
 {'count': 1000000, 'in': 785272}
