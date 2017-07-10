@@ -6,7 +6,7 @@ These notes go over a small number of related topics in the area of scalable, di
 
 Within computer science and related fields there exist a large number of mathematical models, paradigms, and tools for analyzing, defining, and implementing computations that take advantage of distributed computing resources (such as [multicore processing](https://en.wikipedia.org/wiki/Multi-core_processor), high-performance [computing clusters](https://en.wikipedia.org/wiki/Computer_cluster), [clouds](https://en.wikipedia.org/wiki/Cloud_computing), and so on). 
 
-In particular, a variety of taxonomies exist for categorizing both computational resources (such as [Flynn's taxonomy](https://en.wikipedia.org/wiki/Flynn%27s_taxonomy)) and for distinguishing techniques (e.g., [data parallelism](https://en.wikipedia.org/wiki/Data_parallelism) vs. [task parallelism](https://en.wikipedia.org/wiki/Task_parallelism). Furthermore, there exist many ways to classify problems in terms of their amenability to different distributed computing or parallelization techniques. With the advent of contemporary cloud computing environments these distinctions are less rigid; setting up an infrastructure to match a problem is becoming quicker and easier.
+In particular, a variety of taxonomies exist for categorizing both computational resources (such as [Flynn's taxonomy](https://en.wikipedia.org/wiki/Flynn%27s_taxonomy)) and for distinguishing techniques (e.g., [data parallelism](https://en.wikipedia.org/wiki/Data_parallelism) vs. [task parallelism](https://en.wikipedia.org/wiki/Task_parallelism)). Furthermore, there exist many ways to classify problems in terms of their amenability to different distributed computing or parallelization techniques. With the advent of contemporary cloud computing environments these distinctions are less rigid; setting up an infrastructure to match a problem is becoming quicker and easier.
 
 Dealing with only a small region of this broad landscape, these notes discuss only a particular family of paradigms and tools for solving *algebraically decomposable problems* (in which communication costs between concurrent operations are fairly limited and primarily one-way) using homogenous distributed storage and computing resources (typically available in a contemporary cloud computing environment such as Amazon Web Services). Whether these are useful in a given situation depends on the particular properties of the problem and the types of distributed computing resources available. Some ways to determine the suitability of these techniques or the scalable solvability of a given problem are discussed and illustrated through examples.
 
@@ -28,13 +28,13 @@ A *key-value store* is a data set in which each record is associated with an ide
 
 The particular family of scalable and distributed computation paradigms on which these notes focus relies heavily on the algebraic properties of computations over data. If we treat individual data records as elements in a set and computations as operations over those elements, we can talk about their algebraic properties.
 
-You are already familiar with several important algebraic properties: associativity and commutativity. These properties apply to operations such as addition, multiplication, union, intersection, maximum/minimum, and others:
+You are already familiar with several important algebraic properties: associativity and commutativity. These properties apply to operations such as addition, multiplication, maximum/minimum, set union, set intersection, and others:
 * *a* + *b* = *b* + *a*
 * *x* &middot; (*y* &middot; *z*) = (*x* &middot; *y*) &middot; *z*
 * **max**(*x*, *y*) = **max**(*y*, *x*)
 * {1,2,3} &cup; {4,5} = {4,5} &cup; {1,2,3}
 
-Another useful algebraic property is *idempotence*. An operation is idempotent if applying it once leads to the same result as applying it any number of times after that. Example of idempotent operations include union and maximum:
+Another useful algebraic property is *idempotence*. An operation is idempotent if applying it once leads to the same result as applying it any number of times after that. Example of idempotent operations include set union and maximum:
 * **max**(**max**(**max**(*x*, *y*), *y*), *y*) = **max**(*x*, *y*)
 * {1,2} &cup; {3,4} &cup; {3,4} &cup; {3,4} &cup; {3,4} = {1,2} &cup; {3,4}
 
@@ -154,13 +154,15 @@ Then, our overall result can be obtained using `map` and `reduce`:
 3.141088
 ```
 
-### Example: Computing Word Frequencies
-
 ## Building Indices
 
 A computation applied to a large data set to solve some problem will often need to access various parts of that data set throughout the computation. This is potentially where a large portion of the cost of the computation lies. One way to address this is by building an *index* that allows easier retrieval of records from the data set using some relevant information.
 
-Fortunately, the problem of building an index can often be decomposed into the application of an associative and commutative (and sometimes even idempotent) operator. 
+Fortunately, the problem of building an index can often be decomposed into the application of an associative and commutative (and sometimes even idempotent) operator. This is in part due to the fact that combining of indices is typically related to the algebraic properties of the set union operation, which is associative and commutative.
+
+### Example: Search Index for a Text Corpus
+
+
 
 ## Appendix
 
