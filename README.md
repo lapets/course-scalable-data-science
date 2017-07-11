@@ -204,10 +204,40 @@ if __name__ == '__main__':
     open('index.json', 'w').write(json.dumps({w:list(r[w]) for w in r}, indent=2))
 ```
 
-### Example: K-means
+### Example: Clustring with *k*-means
 
+The following example illustrates how a technique very similar to the above can be used for computing K-means clustering. We first present the one-dimensional case to illustrate the technique.
+```python
+def closest(ms, p):
+    return list(sorted([(abs(m-p), m) for m in ms]))[0][1]
 
+def add(v, w):
+    (t1, c1, m1) = v
+    (t2, c2, m2) = w
+    return (t1 + t2, c1 + c2, (t1 + t2) / (c1 + c2)) 
 
+def assign(means, point):
+    return {closest(means, point): (point, 1, point/1)}
+
+def combine(mp1, mp2):
+    return {m:add(mp1.get(m,(0,0,0)), mp2.get(m,(0,0,0))) for m in mp1.keys() | mp2.keys()}
+
+if __name__ == '__main__':
+    pool = mp.Pool(processes=mp.cpu_count(),)
+
+    # Some sample data.
+    P = [1,0,4,5,7,3,5,2,1,27,34,37,29,25]*10000
+    M = [13, 14]
+
+    # Repeat until convergence.
+    M_OLD = None
+    while M_OLD != M:
+        M_OLD = M
+        ps = map_mp(pool, partial(assign, M), P)
+        M = reduce_mp(pool, combine, ps)
+        M = [m for (m_old, (t, c, m)) in M.items()]
+    print(M)
+```
 
 ## Appendix
 
