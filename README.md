@@ -154,16 +154,64 @@ Then, our overall result can be obtained using `map` and `reduce`:
 3.141088
 ```
 
-## Building Indices
+### MapReduce and Multiprocessing
+
+Breaking a computation down into the MapReduce structure ensures that the data flow dependencies within it are fairly manageable. In particuler, they usually form either a [tree](https://en.wikipedia.org/wiki/Tree_(graph_theory)) or a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph). Thus, it is possible to take advantage of distributed computing resources to parallelize different parts of the program (since different regions of the flow graph do not affect one another until, for example, a reduce operation is encountered).
+
+The particular underlying hardware infrastructure (and the abstraction through which it is delivered) is not too important. For example, we can take advantage of multiple processors within a single machine to parallelize any computation that is in MapReduce form. Below we define a diffrent variant of the map and reduce functions that take advantage of Python's `multiprocessing` library.
+```python
+import multiprocessing as mp
+from functools import reduce
+from functools import partial
+from parts import parts
+
+def map_mp(pool, op, xs):
+    return pool.map(partial(map, op), parts(xs, pool._processes))
+
+def reduce_mp(pool, op, xs_per_part):
+    return reduce(op, pool.map(partial(reduce, op), xs_per_part))
+```
+Given the above, we do not need to change any other part of our previous example for estimating &pi;. However, it now takes advantage of multiple processors where possible to parallelize both the map and reduce steps of the computation.
+```python
+if __name__ == '__main__':
+    pool = mp.Pool(processes = mp.cpu_count(),)
+    ps = map_mp(pool, trial, range(1000000))
+    r = reduce_mp(pool, combine, ps)
+    print(4*r['in']/float(r['count']))
+```
+
+### Example: Search Index for a Text Corpus
 
 A computation applied to a large data set to solve some problem will often need to access various parts of that data set throughout the computation. This is potentially where a large portion of the cost of the computation lies. One way to address this is by building an *index* that allows easier retrieval of records from the data set using some relevant information.
 
 Fortunately, the problem of building an index can often be decomposed into the application of an associative and commutative (and sometimes even idempotent) operator. This is in part due to the fact that combining of indices is typically related to the algebraic properties of the set union operation, which is associative and commutative.
 
-### Example: Search Index for a Text Corpus
+We consider an example in which we have a corpus of articles and wish to construct an index that maps each word that occurs in any of the articles to the list of article indices where it occurs.
+```python
+import json
+
+def index(article):
+    return {word:{article['id']} for word in set(article['text'].split(" "))}
+
+def combine(i, j):
+    return {k:(i.get(k,set()) | j.get(k,set())) for k in i.keys() | j.keys()} 
+
+if __name__ == '__main__':
+    pool = mp.Pool(processes=mp.cpu_count(),) #
+    articles = json.load(open('nyt.json', 'r'))
+    ps = map_mp(pool, index, articles)
+    r = reduce_mp(pool, combine, ps)
+    open('index.json', 'w').write(json.dumps({w:list(r[w]) for w in r}, indent=2))
+```
+
+### Example: K-means
+
 
 
 
 ## Appendix
 
-The examples in these notes rely on Python 3. You should [download and install Python 3](https://www.python.org/) if you want to replicate or interactively explore the examples.
+The examples in these notes rely on Python 3. You should [download and install Python 3](https://www.python.org/) if you want to replicate or interactively explore the examples. Once you do so, you should install all the Python libraries on which the examples in these notes rely by running the following command:
+```
+python -m pip install -r requirements.txt
+```
