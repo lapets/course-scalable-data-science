@@ -2,7 +2,7 @@ To run a sample job on your cluster, please follow the steps below:
 
 Part 1:
 
-We will be using Github gists for writing code:
+We will be using Github gists for writing code. If you want to know more about how gists work, please go through the following tutorial: https://help.github.com/articles/about-gists/
 
 1. The first thing you should know is how to setup a github gist workflow.
 
@@ -10,7 +10,7 @@ We will be using Github gists for writing code:
 
     * Copy the gist url at the top of the webpage
 
-
+Part 2:
 2. Now you need to SSH into the master machine for your cluster. For linux and mac, the SSH utility comes by default. For windows, try installing a client like PuTTY: http://www.putty.org/ and use a command line interface.
 
    Login into your cluster's master node using SSH :
@@ -31,8 +31,9 @@ We will be using Github gists for writing code:
 If you want to update the code, based on whether or not you have a github account, please follow the steps below:
     
   * If you are logged into github, you can simply edit your code online in the github gist interface and in the master machine:
-        * cd into the gist folder using ```cd mygist/```    
-        * Pull the new code using ```git pull```
+  
+       * cd into the gist folder using ```cd mygist/```    
+       * Pull the new code using ```git pull```
         
   * If you are not logged in, please create a new gist everytime you change your code, clone the new gist into your master machine's home directory run the job file as shown above. (Step 3)
 
