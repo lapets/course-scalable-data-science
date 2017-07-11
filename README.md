@@ -197,7 +197,7 @@ def combine(i, j):
     return {k:(i.get(k,set()) | j.get(k,set())) for k in i.keys() | j.keys()} 
 
 if __name__ == '__main__':
-    pool = mp.Pool(processes=mp.cpu_count(),) #
+    pool = mp.Pool(processes=mp.cpu_count(),)
     articles = json.load(open('nyt.json', 'r'))
     ps = map_mp(pool, index, articles)
     r = reduce_mp(pool, combine, ps)
