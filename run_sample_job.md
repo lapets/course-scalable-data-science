@@ -1,7 +1,5 @@
 To run a sample job on your cluster, please follow the steps below:
 
-Part 1:
-
 We will be using Github gists for writing code. If you want to know more about how gists work, please go through the following tutorial: https://help.github.com/articles/about-gists/
 
 1. The first thing you should know is how to setup a github gist workflow.
@@ -10,7 +8,6 @@ We will be using Github gists for writing code. If you want to know more about h
 
     * Copy the gist url at the top of the webpage
 
-Part 2:
 2. Now you need to SSH into the master machine for your cluster. For linux and mac, the SSH utility comes by default. For windows, try installing a client like PuTTY: http://www.putty.org/ and use a command line interface.
 
    Login into your cluster's master node using SSH :
