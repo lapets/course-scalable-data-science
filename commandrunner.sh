@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#Just this will not do, you need to have appropriate keys to run this file!
 echo "You are about to execute the $1 command for the $2 cluster"
 
 for i in {1..5}
