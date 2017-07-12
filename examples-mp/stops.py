@@ -16,12 +16,11 @@ def map_mp(pool, op, xs):
 def reduce_mp(pool, op, xs_per_part):
     return reduce(op, pool.map(partial(reduce, op), xs_per_part))
 
-def assign(rt, fs):
+def assign(rt, f):
     student_to_stop = {}
-    for f in fs:
-        (lon, lat) = f["geometry"]["coordinates"][0]
-        index = next(rt.nearest((lon, lat, lon, lat), 1))
-        student_to_stop[(lon, lat)] = index
+    (lon, lat) = f["geometry"]["coordinates"][0]
+    index = next(rt.nearest((lon, lat, lon, lat), 1))
+    student_to_stop[(lon, lat)] = index
     return student_to_stop
 
 if __name__ == '__main__':
