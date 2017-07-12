@@ -104,9 +104,10 @@ def avg_age_wgtd(r1, r2):
 ```
 Notice that we also took the opportunity above to drop the `"name"` attribute, which we do not need in the rest of the computation (nor does it make sense to have an individual name for an aggregate total within the context of the example). We then *map* the `age_wgtd` function across the data set records before applying our reduce operation.
 ```python
->>> map(age_wgtd, D)
+>>> I = map(age_wgtd, D)
+>>> I
 [{"age":24, "wgt":1}, {"age":20, "wgt":1}, {"age":31, "wgt":1}]
->>> reduce(avg_age_wgtd, D)
+>>> reduce(avg_age_wgtd, I)
 [{"age":75, "wgt":3}]
 ```
 The above gives us exactly one record from which we can compute the correct average of 75/3 = 25.
