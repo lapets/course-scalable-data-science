@@ -1,6 +1,6 @@
 from pyspark import SparkContext
 sc = SparkContext("local", "Pi Leibniz approximation")
-iteration=1000000
+iteration=10000
 partition=4
 data = range(0,iteration)
 distIn = sc.parallelize(data,partition)
