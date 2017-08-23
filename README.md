@@ -205,7 +205,7 @@ if __name__ == '__main__':
     open('index.json', 'w').write(json.dumps({w:list(r[w]) for w in r}, indent=2))
 ```
 
-### Example: Clustring with *k*-means
+### Example: Clustering with *k*-means
 
 The following example illustrates how a technique very similar to the above can be used for computing K-means clustering. We first present the one-dimensional case to illustrate the technique.
 ```python
